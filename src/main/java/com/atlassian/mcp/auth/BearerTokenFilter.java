@@ -31,21 +31,32 @@ public class BearerTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         
-        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        // 1. 먼저 jira_token, confluence_token 헤더 확인
+        String jiraToken = request.getHeader("jira_token");
+        String confluenceToken = request.getHeader("confluence_token");
         
+        // 2. 없으면 Authorization Bearer 토큰 사용
+        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        String defaultToken = null;
         if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
-            String token = authHeader.substring(BEARER_PREFIX.length()).trim();
-            
-            // Python의 request.state.user_atlassian_token과 동일
-            // Jira와 Confluence 모두 동일한 토큰 사용
-            request.setAttribute("jira_token", token);
-            request.setAttribute("confluence_token", token);
-            request.setAttribute("auth_mode", "none");
-            
-            log.debug("Bearer token extracted for Jira and Confluence");
-        } else {
-            log.debug("No Bearer token in Authorization header");
+            defaultToken = authHeader.substring(BEARER_PREFIX.length()).trim();
         }
+        
+        // 3. 각 토큰 설정 (우선순위: 개별 헤더 > Authorization)
+        String finalJiraToken = (jiraToken != null && !jiraToken.isBlank()) ? jiraToken : defaultToken;
+        String finalConfluenceToken = (confluenceToken != null && !confluenceToken.isBlank()) ? confluenceToken : defaultToken;
+        
+        if (finalJiraToken != null) {
+            request.setAttribute("jira_token", finalJiraToken);
+            log.debug("Jira token extracted");
+        }
+        
+        if (finalConfluenceToken != null) {
+            request.setAttribute("confluence_token", finalConfluenceToken);
+            log.debug("Confluence token extracted");
+        }
+        
+        request.setAttribute("auth_mode", "none");
         
         filterChain.doFilter(request, response);
     }

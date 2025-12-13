@@ -15,7 +15,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class JiraToolsTest {
 
-    private JiraTools jiraTools;
+    private JiraReadToolsA readToolsA;
+    private JiraReadToolsB readToolsB;
+    private JiraReadToolsC readToolsC;
     
     @BeforeEach
     void setUp() {
@@ -25,7 +27,9 @@ class JiraToolsTest {
         ObjectMapper mapper = new ObjectMapper();
         
         JiraClient client = new JiraClient(baseUrl, token, mapper);
-        jiraTools = new JiraTools(() -> client);
+        readToolsA = new JiraReadToolsA(() -> client);
+        readToolsB = new JiraReadToolsB(() -> client);
+        readToolsC = new JiraReadToolsC(() -> client);
     }
 
     @Test
@@ -34,7 +38,7 @@ class JiraToolsTest {
         params.put("jql", "project = ADPLAT ORDER BY created DESC");
         params.put("limit", 5);
         
-        Map<String, Object> result = jiraTools.search(params).block();
+        Map<String, Object> result = readToolsC.search(params).block();
         
         System.out.println("=== Jira Search ===");
         System.out.println("Full Result: " + result);
@@ -61,7 +65,7 @@ class JiraToolsTest {
     void testGetAllProjects() {
         Map<String, Object> params = new HashMap<>();
         
-        Map<String, Object> result = jiraTools.getAllProjects(params).block();
+        Map<String, Object> result = readToolsA.getAllProjects(params).block();
         
         assertNotNull(result);
         
@@ -83,7 +87,7 @@ class JiraToolsTest {
     void testSearchFields() {
         Map<String, Object> params = new HashMap<>();
         
-        Map<String, Object> result = jiraTools.searchFields(params).block();
+        Map<String, Object> result = readToolsC.searchFields(params).block();
         
         assertNotNull(result);
         
@@ -105,7 +109,7 @@ class JiraToolsTest {
     void testGetLinkTypes() {
         Map<String, Object> params = new HashMap<>();
         
-        Map<String, Object> result = jiraTools.getLinkTypes(params).block();
+        Map<String, Object> result = readToolsB.getLinkTypes(params).block();
         
         assertNotNull(result);
         
@@ -127,7 +131,7 @@ class JiraToolsTest {
     void testGetAgileBoards() {
         Map<String, Object> params = new HashMap<>();
         
-        Map<String, Object> result = jiraTools.getAgileBoards(params).block();
+        Map<String, Object> result = readToolsA.getAgileBoards(params).block();
         
         assertNotNull(result);
         

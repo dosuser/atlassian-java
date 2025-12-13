@@ -1,4 +1,4 @@
-package com.atlassian.mcp.confluence;
+ package com.atlassian.mcp.confluence;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import reactor.core.publisher.Mono;
@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  */
 public class ConfluenceTools {
     private final Supplier<ConfluenceClient> clientSupplier;
-
+    
     public ConfluenceTools(Supplier<ConfluenceClient> clientSupplier) {
         this.clientSupplier = clientSupplier;
     }
@@ -29,9 +29,14 @@ public class ConfluenceTools {
     /**
      * Confluence 페이지 조회 (confluence_get_page).
      * 
-     * Python 원본: async def get_page(ctx, page_id, title, space_key, include_metadata, convert_to_markdown)
+     * Python 스키마:
+     * - page_id (string, optional): Confluence page ID (numeric)
+     * - title (string, optional): Page title (use with space_key)
+     * - space_key (string, optional): Space key (use with title)
+     * - include_metadata (boolean, default: true): Include page metadata
+     * - convert_to_markdown (boolean, default: true): Convert to markdown
      * 
-     * @param params 파라미터 맵 (page_id 또는 title+space_key, include_metadata 등)
+     * @param params 파라미터 맵
      * @return 페이지 정보 JSON
      */
     public Mono<Map<String, Object>> getPage(Map<String, Object> params) {
@@ -62,9 +67,12 @@ public class ConfluenceTools {
     /**
      * CQL 검색 (confluence_search).
      * 
-     * Python 원본: async def search(ctx, query, limit, spaces_filter)
+     * Python 스키마:
+     * - query (string, required): Search query - can be simple text or CQL query string
+     * - limit (integer, default: 10): Maximum number of results (1-50)
+     * - spaces_filter (string, optional): Comma-separated space keys to filter results
      * 
-     * @param params 파라미터 맵 (query, limit 등)
+     * @param params 파라미터 맵
      * @return 검색 결과 JSON
      */
     public Mono<Map<String, Object>> search(Map<String, Object> params) {
@@ -85,6 +93,9 @@ public class ConfluenceTools {
         if (!query.contains("=") && !query.contains("~") && !query.contains(" AND ") && !query.contains(" OR ")) {
             cql = "text ~ \"" + query + "\"";
         }
+        
+        // CQL에서 space key에 특수문자(~)가 있는 경우 자동으로 quote 처리
+        cql = CqlUtils.autoQuoteSpaceKeys(cql);
 
         return getClient().search(cql, limit)
                 .map(this::convertSearchResults)
@@ -148,11 +159,28 @@ public class ConfluenceTools {
         return result;
     }
 
+    /**
+     * Confluence 페이지 하위 페이지 조회 (confluence_get_page_children).
+     * 
+     * Python 스키마:
+     * - parent_id (string, required): Parent page ID
+     * - expand (string, default: "version"): Fields to expand
+     * - limit (integer, default: 25): Maximum number of results (1-50)
+     * - include_content (boolean, default: false): Include page content
+     * - convert_to_markdown (boolean, default: true): Convert to markdown
+     * - start (integer, default: 0): Starting index for pagination
+     * 
+     * @param params 파라미터 맵
+     * @return 하위 페이지 목록 JSON
+     */
     public Mono<Map<String, Object>> getPageChildren(Map<String, Object> params) {
         String pageId = (String) params.get("parent_id");
         int start = (int) params.getOrDefault("start", 0);
         int limit = (int) params.getOrDefault("limit", 25);
         String expand = (String) params.getOrDefault("expand", "version");
+        // TODO: Python 파라미터 구현 필요 - include_content, convert_to_markdown
+        // boolean includeContent = (boolean) params.getOrDefault("include_content", false);
+        // boolean convertToMarkdown = (boolean) params.getOrDefault("convert_to_markdown", true);
         
         if (pageId == null || pageId.isBlank()) {
             return Mono.error(new IllegalArgumentException("parent_id is required"));
@@ -178,6 +206,15 @@ public class ConfluenceTools {
                 .onErrorResume(e -> Mono.just(Map.of("success", false, "error", e.getMessage())));
     }
 
+    /**
+     * Confluence 페이지 댓글 조회 (confluence_get_comments).
+     * 
+     * Python 스키마:
+     * - page_id (string, required): Page ID
+     * 
+     * @param params 파라미터 맵
+     * @return 댓글 목록 JSON
+     */
     public Mono<Map<String, Object>> getComments(Map<String, Object> params) {
         String pageId = (String) params.get("page_id");
         if (pageId == null || pageId.isBlank()) {
@@ -199,6 +236,15 @@ public class ConfluenceTools {
                 .onErrorResume(e -> Mono.just(Map.of("success", false, "error", e.getMessage())));
     }
 
+    /**
+     * Confluence 페이지 라벨 조회 (confluence_get_labels).
+     * 
+     * Python 스키마:
+     * - page_id (string, required): Page ID
+     * 
+     * @param params 파라미터 맵
+     * @return 라벨 목록 JSON
+     */
     public Mono<Map<String, Object>> getLabels(Map<String, Object> params) {
         String pageId = (String) params.get("page_id");
         if (pageId == null || pageId.isBlank()) {
@@ -214,6 +260,16 @@ public class ConfluenceTools {
                 .onErrorResume(e -> Mono.just(Map.of("success", false, "error", e.getMessage())));
     }
 
+    /**
+     * Confluence 페이지 라벨 추가 (confluence_add_label).
+     * 
+     * Python 스키마:
+     * - page_id (string, required): Page ID
+     * - name (string, required): Label name
+     * 
+     * @param params 파라미터 맵
+     * @return 업데이트된 라벨 목록 JSON
+     */
     public Mono<Map<String, Object>> addLabel(Map<String, Object> params) {
         String pageId = (String) params.get("page_id");
         String name = (String) params.get("name");
@@ -231,11 +287,28 @@ public class ConfluenceTools {
                 .onErrorResume(e -> Mono.just(Map.of("success", false, "error", e.getMessage())));
     }
 
+    /**
+     * Confluence 페이지 생성 (confluence_create_page).
+     * 
+     * Python 스키마:
+     * - space_key (string, required): Space key
+     * - title (string, required): Page title
+     * - content (string, required): Page content
+     * - parent_id (string, optional): Parent page ID
+     * - content_format (string, default: "markdown"): Format (markdown/wiki/storage)
+     * - enable_heading_anchors (boolean, default: false): Enable heading anchors
+     * 
+     * @param params 파라미터 맵
+     * @return 생성된 페이지 정보 JSON
+     */
     public Mono<Map<String, Object>> createPage(Map<String, Object> params) {
         String spaceKey = (String) params.get("space_key");
         String title = (String) params.get("title");
         String content = (String) params.get("content");
         String parentId = (String) params.get("parent_id");
+        // TODO: Python 파라미터 구현 필요 - content_format (markdown/wiki/storage 변환), enable_heading_anchors
+        // String contentFormat = (String) params.getOrDefault("content_format", "markdown");
+        // boolean enableHeadingAnchors = (boolean) params.getOrDefault("enable_heading_anchors", false);
         
         if (spaceKey == null || title == null || content == null) {
             return Mono.error(new IllegalArgumentException("space_key, title, and content are required"));
@@ -260,16 +333,40 @@ public class ConfluenceTools {
                 .onErrorResume(e -> Mono.just(Map.of("success", false, "error", e.getMessage())));
     }
 
+    /**
+     * Confluence 페이지 업데이트 (confluence_update_page).
+     * 
+     * Python 스키마:
+     * - page_id (string, required): Page ID
+     * - title (string, required): Page title
+     * - content (string, required): Page content
+     * - is_minor_edit (boolean, default: false): Minor edit flag
+     * - version_comment (string, optional): Version comment
+     * - parent_id (string, optional): New parent page ID
+     * - content_format (string, default: "markdown"): Format (markdown/wiki/storage)
+     * - enable_heading_anchors (boolean, default: false): Enable heading anchors
+     * 
+     * @param params 파라미터 맵
+     * @return 업데이트된 페이지 정보 JSON
+     */
     public Mono<Map<String, Object>> updatePage(Map<String, Object> params) {
         String pageId = (String) params.get("page_id");
         String title = (String) params.get("title");
         String content = (String) params.get("content");
+        // TODO: Python 파라미터 구현 필요 - is_minor_edit, version_comment, parent_id, content_format, enable_heading_anchors
+        // boolean isMinorEdit = (boolean) params.getOrDefault("is_minor_edit", false);
+        // String versionComment = (String) params.get("version_comment");
+        // String parentId = (String) params.get("parent_id");
+        // String contentFormat = (String) params.getOrDefault("content_format", "markdown");
+        // boolean enableHeadingAnchors = (boolean) params.getOrDefault("enable_heading_anchors", false);
         
         if (pageId == null || title == null || content == null) {
             return Mono.error(new IllegalArgumentException("page_id, title, and content are required"));
         }
         
-        return getClient().getPage(pageId, "version")
+        // Client를 먼저 가져와서 flatMap 안에서 재사용 (RequestContext 유지)
+        ConfluenceClient client = getClient();
+        return client.getPage(pageId, "version")
                 .flatMap(currentPage -> {
                     int currentVersion = currentPage.path("version").path("number").asInt();
                     Map<String, Object> pageData = new HashMap<>();
@@ -277,7 +374,7 @@ public class ConfluenceTools {
                     pageData.put("title", title);
                     pageData.put("version", Map.of("number", currentVersion + 1));
                     pageData.put("body", Map.of("storage", Map.of("value", content, "representation", "storage")));
-                    return getClient().updatePage(pageId, pageData);
+                    return client.updatePage(pageId, pageData);
                 })
                 .map(node -> Map.<String, Object>of(
                         "success", true,
@@ -288,6 +385,15 @@ public class ConfluenceTools {
                 .onErrorResume(e -> Mono.just(Map.of("success", false, "error", e.getMessage())));
     }
 
+    /**
+     * Confluence 페이지 삭제 (confluence_delete_page).
+     * 
+     * Python 스키마:
+     * - page_id (string, required): Page ID to delete
+     * 
+     * @param params 파라미터 맵
+     * @return 삭제 결과 JSON
+     */
     public Mono<Map<String, Object>> deletePage(Map<String, Object> params) {
         String pageId = (String) params.get("page_id");
         if (pageId == null || pageId.isBlank()) {
@@ -302,6 +408,16 @@ public class ConfluenceTools {
                 .onErrorResume(e -> Mono.just(Map.of("success", false, "error", e.getMessage())));
     }
 
+    /**
+     * Confluence 페이지 댓글 추가 (confluence_add_comment).
+     * 
+     * Python 스키마:
+     * - page_id (string, required): Page ID
+     * - content (string, required): Comment content in Markdown
+     * 
+     * @param params 파라미터 맵
+     * @return 생성된 댓글 정보 JSON
+     */
     public Mono<Map<String, Object>> addComment(Map<String, Object> params) {
         String pageId = (String) params.get("page_id");
         String content = (String) params.get("content");
@@ -318,6 +434,16 @@ public class ConfluenceTools {
                 .onErrorResume(e -> Mono.just(Map.of("success", false, "error", e.getMessage())));
     }
 
+    /**
+     * Confluence 사용자 검색 (confluence_search_user).
+     * 
+     * Python 스키마:
+     * - query (string, required): Search query - CQL query string
+     * - limit (integer, default: 10): Maximum number of results (1-50)
+     * 
+     * @param params 파라미터 맵
+     * @return 사용자 검색 결과 JSON
+     */
     public Mono<Map<String, Object>> searchUser(Map<String, Object> params) {
         String query = (String) params.get("query");
         int limit = (int) params.getOrDefault("limit", 10);

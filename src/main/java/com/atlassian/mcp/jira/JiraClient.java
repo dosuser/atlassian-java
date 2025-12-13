@@ -204,7 +204,7 @@ public class JiraClient {
                 .uri("/rest/api/2/issue/{issueKey}", issueKey)
                 .bodyValue(Map.of("fields", updateData))
                 .retrieve()
-                .bodyToMono(JsonNode.class)
+                .toBodilessEntity()
                 .then(getIssue(issueKey, null, null));
     }
 
@@ -236,7 +236,7 @@ public class JiraClient {
                 .uri("/rest/api/2/issue/{issueKey}/transitions", issueKey)
                 .bodyValue(transitionData)
                 .retrieve()
-                .bodyToMono(JsonNode.class)
+                .toBodilessEntity()
                 .then(getIssue(issueKey, null, null));
     }
 
@@ -245,7 +245,8 @@ public class JiraClient {
                 .uri("/rest/api/2/issueLink")
                 .bodyValue(linkData)
                 .retrieve()
-                .bodyToMono(JsonNode.class);
+                .toBodilessEntity()
+                .thenReturn(mapper.createObjectNode().put("success", true));
     }
 
     public Mono<JsonNode> createRemoteIssueLink(String issueKey, Map<String, Object> linkData) {
@@ -269,7 +270,7 @@ public class JiraClient {
                 .uri("/rest/agile/1.0/epic/{epicKey}/issue", epicKey)
                 .bodyValue(Map.of("issues", new String[]{issueKey}))
                 .retrieve()
-                .bodyToMono(JsonNode.class)
+                .toBodilessEntity()
                 .then(getIssue(issueKey, null, null));
     }
 

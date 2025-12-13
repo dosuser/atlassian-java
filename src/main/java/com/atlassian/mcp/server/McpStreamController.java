@@ -136,20 +136,45 @@ public class McpStreamController {
     }
 
     /**
+     * GET /tools - List all available tools (JSON format)
+     * Simple HTTP endpoint for viewing tool documentation
+     */
+    @GetMapping(value = "/tools", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> getTools() {
+        log.debug("HTTP GET /tools request");
+        
+        var toolMetadataList = registry.getAllMetadata();
+        var tools = toolMetadataList.stream()
+            .map(meta -> Map.of(
+                "name", meta.getName(),
+                "description", meta.getDescription(),
+                "inputSchema", meta.getInputSchema()
+            ))
+            .toList();
+
+        return Map.of(
+            "serverInfo", Map.of(
+                "name", "mcp-atlassian-java",
+                "version", "0.1.0",
+                "protocol", "MCP 2024-11-05"
+            ),
+            "totalTools", tools.size(),
+            "tools", tools
+        );
+    }
+
+    /**
      * Handle tools/list request
      */
     private McpResponse handleToolsList(Object id) {
         log.debug("Handling tools/list request");
         
-        var toolNames = registry.all().keySet();
-        var tools = toolNames.stream()
-            .map(name -> Map.of(
-                "name", name,
-                "description", "Atlassian tool: " + name,
-                "inputSchema", Map.of(
-                    "type", "object",
-                    "properties", Map.of()
-                )
+        var toolMetadataList = registry.getAllMetadata();
+        var tools = toolMetadataList.stream()
+            .map(meta -> Map.of(
+                "name", meta.getName(),
+                "description", meta.getDescription(),
+                "inputSchema", meta.getInputSchema()
             ))
             .toList();
 
