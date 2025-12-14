@@ -45,18 +45,18 @@ vs code에 mcp가 등록되어 있다. #
 ## Jira 테스트 작업
 
 ### 1. 이슈 조회 (Read)
-- [x] jira_search: JQL로 최근 업데이트된 이슈 검색 ✅ (GFA_SERVING 프로젝트 346건)
-- [x] jira_get_issue: 특정 이슈 상세 조회 ✅ (GFA_SERVING-352)
+- [x] jira_search: JQL로 최근 업데이트된 이슈 검색 ✅ (PROJECT 346건)
+- [x] jira_get_issue: 특정 이슈 상세 조회 ✅ (PROJECT-352)
 - [x] jira_search_fields: 필드 검색 (summary, status 등) ✅ (status 검색: 2개 필드)
 - [x] jira_get_transitions: 이슈의 가능한 상태 전환 조회 ✅ (8개 전환)
 
 ### 2. 프로젝트 및 버전 (Read)
 - [ ] jira_get_all_projects: 모든 프로젝트 목록 조회 ⚠️ (DataBufferLimitException: 262144 바이트 초과)
-- [x] jira_get_project_issues: 특정 프로젝트의 이슈 목록 ✅ (GFA_SERVING: 346건)
+- [x] jira_get_project_issues: 특정 프로젝트의 이슈 목록 ✅ (PROJECT: 346건)
 - [x] jira_get_project_versions: 프로젝트의 버전 목록 ✅ (3개 버전)
 
 ### 3. 애자일 보드 (Read)
-- [x] jira_get_agile_boards: 보드 목록 조회 ✅ (GFA_SERVING 2개 보드)
+- [x] jira_get_agile_boards: 보드 목록 조회 ✅ (PROJECT 2개 보드)
 - [x] jira_get_board_issues: 특정 보드의 이슈 조회 ✅ (board_id: 1800, 338건)
 - [x] jira_get_sprints_from_board: 보드의 스프린트 목록 ✅ (board_id: 1804, 1개 스프린트)
 - [x] jira_get_sprint_issues: 특정 스프린트의 이슈 목록 ✅ (sprint_id: 2301, 6건)
@@ -64,18 +64,18 @@ vs code에 mcp가 등록되어 있다. #
 ### 4. 코멘트 및 워크로그 (Read)
 - [x] jira_get_worklog: 이슈의 작업 기록 조회 ✅ (1개 워크로그)
 
-### 5. 이슈 생성 및 수정 (Write) (GFA_SERVING 프로젝트는 "작업" 타입 사용, "Task" 아님)
-- [x] jira_update_issue: 이슈 정보 수정 ✅ (GFA_SERVING-352, 204 No Content 처리 수정됨)
-- [x] jira_transition_issue: 이슈 상태 전환 ✅ (GFA_SERVING-352 -> "진행중" transition_id=21, 204 처리 수정됨)
-- [x] jira_add_comment: 이슈에 코멘트 추가 ✅ (GFA_SERVING-352에 코멘트 ID 11350584 추가됨)
-- [x] jira_add_worklog: 작업 시간 기록 ✅ (GFA_SERVING-352에 1h 작업 시간 기록 ID 1559594)
+### 5. 이슈 생성 및 수정 (Write) (PROJECT는 "작업" 타입 사용, "Task" 아님)
+- [x] jira_update_issue: 이슈 정보 수정 ✅ (PROJECT-352, 204 No Content 처리 수정됨)
+- [x] jira_transition_issue: 이슈 상태 전환 ✅ (PROJECT-352 -> "진행중" transition_id=21, 204 처리 수정됨)
+- [x] jira_add_comment: 이슈에 코멘트 추가 ✅ (PROJECT-352에 코멘트 ID 11350584 추가됨)
+- [x] jira_add_worklog: 작업 시간 기록 ✅ (PROJECT-352에 1h 작업 시간 기록 ID 1559594)
 - [ ] jira_delete_issue: 이슈 삭제
 
 ### 6. 링크 및 관계 (Write)
-- [x] jira_create_issue_link: 이슈 간 링크 생성 ✅ (GFA_SERVING-352와 GFA_SERVING-392를 '관련된 이슈'로 연결)
+- [x] jira_create_issue_link: 이슈 간 링크 생성 ✅ (PROJECT-352와 PROJECT-392를 '관련된 이슈'로 연결)
 - [x] jira_get_link_types: 사용 가능한 링크 타입 조회 ✅ (8개 타입)
 - [ ] jira_remove_issue_link: 이슈 링크 제거
-- [x] jira_link_to_epic: 이슈를 에픽에 연결 ✅ (GFA_SERVING-352 -> GFA_SERVING-332 Epic 연결, 204 처리 수정됨)
+- [x] jira_link_to_epic: 이슈를 에픽에 연결 ✅ (PROJECT-352 -> PROJECT-332 Epic 연결, 204 처리 수정됨)
 
 ### 7. 버전 관리 (Write)
 - [x] jira_create_version: 새 버전 생성 ✅ (MCP-TEST-VERSION-1.0, ID: 419754)
@@ -83,7 +83,7 @@ vs code에 mcp가 등록되어 있다. #
 
 ### 8. 일괄 작업 (Write)
 - [ ] jira_batch_create_issues: 여러 이슈 일괄 생성 ⚠️ (400 Bad Request - 서버측 이슈 가능성)
-- [x] jira_batch_get_changelogs: 여러 이슈의 변경 이력 조회 ✅ (GFA_SERVING-352: 9개, GFA_SERVING-392: 2개)
+- [x] jira_batch_get_changelogs: 여러 이슈의 변경 이력 조회 ✅ (PROJECT-352: 9개, PROJECT-392: 2개)
 
 ### 9. 코드 수정 내역
 
