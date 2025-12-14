@@ -22,7 +22,7 @@ class JiraToolsTest {
     @BeforeEach
     void setUp() {
         // 실제 설정값으로 클라이언트 및 도구 생성
-        String baseUrl = "https://jira.navercorp.com";
+        String baseUrl = System.getenv("JIRA_BASE_URL");
         String token = "EXAMPLE_TOKEN_FOR_TESTING";
         ObjectMapper mapper = new ObjectMapper();
         

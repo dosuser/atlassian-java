@@ -1,11 +1,6 @@
 테스트 방법
 vs code에 mcp가 등록되어 있다. #
-테스트 대상 문서
-https://wiki.navercorp.com/spaces/~KR18723/pages/4548210001/test
-(토큰은 .env 파일에서 관리)
-
-jira는 autobid 프로젝트 하위로 테스트해
-jira 테스트 기준 https://jira.navercorp.com/browse/GFA_SERVING-352
+(테스트 대상 URL과 토큰은 .env 파일에서 관리)
 
 ## Confluence (Wiki) 테스트 작업
 

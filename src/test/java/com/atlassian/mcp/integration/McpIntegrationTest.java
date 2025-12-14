@@ -34,7 +34,7 @@ class McpIntegrationTest {
         ObjectMapper mapper = new ObjectMapper();
         
         // 2. Jira 클라이언트 및 도구 생성
-        String jiraBaseUrl = "https://jira.navercorp.com";
+        String jiraBaseUrl = System.getenv("JIRA_BASE_URL");
         String jiraToken = "EXAMPLE_JIRA_TOKEN";
         JiraClient jiraClient = new JiraClient(jiraBaseUrl, jiraToken, mapper);
         jiraReadToolsA = new JiraReadToolsA(() -> jiraClient);
@@ -42,7 +42,7 @@ class McpIntegrationTest {
         jiraReadToolsC = new JiraReadToolsC(() -> jiraClient);
         
         // 3. Confluence 클라이언트 및 도구 생성
-        String confluenceBaseUrl = "https://wiki.navercorp.com";
+        String confluenceBaseUrl = System.getenv("CONFLUENCE_BASE_URL");
         String confluenceToken = "EXAMPLE_CONFLUENCE_TOKEN";
         ConfluenceClient confluenceClient = new ConfluenceClient(confluenceBaseUrl, confluenceToken, mapper);
         confluenceTools = new ConfluenceTools(() -> confluenceClient);
