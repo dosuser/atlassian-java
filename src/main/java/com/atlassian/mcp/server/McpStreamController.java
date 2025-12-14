@@ -65,7 +65,7 @@ public class McpStreamController {
                 case "initialize" -> handleInitialize(request.getId(), request.getParams());
                 case "initialized" -> handleInitialized(request.getId());
                 case "ping" -> handlePing(request.getId());
-                case "tools/list" -> handleToolsList(request.getId());
+                case "tools/list" -> handleToolsList(request.getId(), httpRequest);
                 case "tools/call" -> handleToolsCall(request.getId(), request.getParams(), httpRequest);
                 default -> {
                     // Try to invoke as a registered tool
@@ -166,11 +166,20 @@ public class McpStreamController {
     /**
      * Handle tools/list request
      */
-    private McpResponse handleToolsList(Object id) {
+    private McpResponse handleToolsList(Object id, HttpServletRequest httpRequest) {
         log.debug("Handling tools/list request");
+        
+        // Check for readonly header
+        String readonlyHeader = httpRequest.getHeader("X-Readonly");
+        boolean isReadonly = "true".equalsIgnoreCase(readonlyHeader);
+        
+        if (isReadonly) {
+            log.info("Readonly mode enabled - filtering write tools from list");
+        }
         
         var toolMetadataList = registry.getAllMetadata();
         var tools = toolMetadataList.stream()
+            .filter(meta -> !isReadonly || meta.isReadOnly()) // Filter write tools if readonly
             .map(meta -> Map.of(
                 "name", meta.getName(),
                 "description", meta.getDescription(),
@@ -195,6 +204,22 @@ public class McpStreamController {
         String toolName = (String) params.get("name");
         @SuppressWarnings("unchecked")
         Map<String, Object> arguments = (Map<String, Object>) params.get("arguments");
+
+        // Check for readonly header
+        String readonlyHeader = httpRequest.getHeader("X-Readonly");
+        boolean isReadonly = "true".equalsIgnoreCase(readonlyHeader);
+        
+        // Check if tool is write operation when readonly mode is enabled
+        if (isReadonly) {
+            var metadata = registry.getAllMetadata().stream()
+                .filter(m -> m.getName().equals(toolName))
+                .findFirst();
+            
+            if (metadata.isPresent() && !metadata.get().isReadOnly()) {
+                log.warn("Readonly mode: blocking write tool execution: {}", toolName);
+                return McpResponse.error(id, -32000, "Write operations not allowed in readonly mode");
+            }
+        }
 
         // JWT audit logging
         if ("jwt".equals(securityMode) && auditLogger != null) {

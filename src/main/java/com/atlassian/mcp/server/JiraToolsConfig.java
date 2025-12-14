@@ -229,6 +229,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("project_key", "summary", "issue_type")
             ),
+            false,
             params -> writeTools.createIssue(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -249,6 +250,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("issues")
             ),
+            false,
             params -> writeTools.batchCreateIssues(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -278,6 +280,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("issue_key", "fields")
             ),
+            false,
             params -> writeTools.updateIssue(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -290,6 +293,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("issue_key")
             ),
+            false,
             params -> writeTools.deleteIssue(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -303,6 +307,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("issue_key", "comment")
             ),
+            false,
             params -> writeTools.addComment(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -320,6 +325,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("issue_key", "time_spent")
             ),
+            false,
             params -> writeTools.addWorklog(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -333,6 +339,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("issue_key", "epic_key")
             ),
+            false,
             params -> writeTools.linkToEpic(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -347,6 +354,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("inward_issue_key", "outward_issue_key", "link_type")
             ),
+            false,
             params -> writeTools.createIssueLink(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -362,6 +370,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("issue_key", "url")
             ),
+            false,
             params -> writeTools.createRemoteIssueLink(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -374,6 +383,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("link_id")
             ),
+            false,
             params -> writeTools.removeIssueLink(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -389,6 +399,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("issue_key", "transition_id")
             ),
+            false,
             params -> writeTools.transitionIssue(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -405,6 +416,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("board_id", "sprint_name", "start_date", "end_date")
             ),
+            false,
             params -> writeTools.createSprint(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -422,6 +434,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("sprint_id")
             ),
+            false,
             params -> writeTools.updateSprint(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -438,6 +451,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("project_key", "name")
             ),
+            false,
             params -> writeTools.createVersion(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -454,6 +468,7 @@ public class JiraToolsConfig {
                 ),
                 "required", java.util.List.of("project_key", "versions")
             ),
+            false,
             params -> writeTools.batchCreateVersions(asMap(params)).toFuture().join()
         );
     }

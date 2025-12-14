@@ -19,7 +19,21 @@ public class ToolRegistry {
      */
     public void register(String name, String description, Map<String, Object> inputSchema, Function<Object, Object> handler) {
         tools.put(name, handler);
-        metadata.put(name, new ToolMetadata(name, description, inputSchema));
+        metadata.put(name, new ToolMetadata(name, description, inputSchema, true)); // default to read-only
+    }
+
+    /**
+     * Register a tool with its metadata, handler function, and readonly flag.
+     *
+     * @param name Tool name
+     * @param description Tool description
+     * @param inputSchema JSON Schema for input parameters
+     * @param readOnly Whether this tool is read-only (true) or write operation (false)
+     * @param handler Function to handle tool invocations
+     */
+    public void register(String name, String description, Map<String, Object> inputSchema, boolean readOnly, Function<Object, Object> handler) {
+        tools.put(name, handler);
+        metadata.put(name, new ToolMetadata(name, description, inputSchema, readOnly));
     }
 
     /**

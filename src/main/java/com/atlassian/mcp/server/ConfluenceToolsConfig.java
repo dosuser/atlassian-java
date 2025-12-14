@@ -89,6 +89,7 @@ public class ConfluenceToolsConfig {
                 ),
                 "required", java.util.List.of("page_id", "name")
             ),
+            false, // write operation
             params -> confluenceTools.addLabel(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -106,6 +107,7 @@ public class ConfluenceToolsConfig {
                 ),
                 "required", java.util.List.of("space_key", "title", "content")
             ),
+            false, // write operation
             params -> confluenceTools.createPage(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -125,6 +127,7 @@ public class ConfluenceToolsConfig {
                 ),
                 "required", java.util.List.of("page_id", "title", "content")
             ),
+            false, // write operation
             params -> confluenceTools.updatePage(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -137,6 +140,7 @@ public class ConfluenceToolsConfig {
                 ),
                 "required", java.util.List.of("page_id")
             ),
+            false, // write operation
             params -> confluenceTools.deletePage(asMap(params)).toFuture().join()
         );
         reg.register(
@@ -150,6 +154,7 @@ public class ConfluenceToolsConfig {
                 ),
                 "required", java.util.List.of("page_id", "content")
             ),
+            false, // write operation
             params -> confluenceTools.addComment(asMap(params)).toFuture().join()
         );
         reg.register(
