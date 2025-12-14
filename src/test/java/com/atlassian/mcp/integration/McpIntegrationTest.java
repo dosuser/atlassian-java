@@ -172,7 +172,7 @@ class McpIntegrationTest {
     @Test
     void testConfluenceSearch() {
         Map<String, Object> params = new HashMap<>();
-        params.put("cql", "type=page AND space=~KR18723");
+        params.put("cql", "type=page AND space=~TESTSPACE");
         params.put("limit", 3);
         
         Object result = toolRegistry.invoke("confluence_search", params);

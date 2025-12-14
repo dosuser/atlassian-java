@@ -6,14 +6,14 @@ vs code에 mcp가 등록되어 있다. #
 
 ### 1. 페이지 조회 (Read)
 - [x] confluence_get_page: 페이지 ID로 특정 페이지 내용 가져오기 ✅ (ID: 4548210001)
-- [x] confluence_get_page: 페이지 제목 + Space Key로 페이지 가져오기 ✅ (title: test, space: ~KR18723)
+- [x] confluence_get_page: 페이지 제목 + Space Key로 페이지 가져오기 ✅ (title: test, space: ~SPACE_KEY)
 - [x] confluence_get_page: 마크다운 변환 옵션 테스트 ✅
 - [x] confluence_get_page_children: 하위 페이지 목록 조회 (parent_id 파라미터 사용)
 
 ### 2. 검색 (Search)
-- [x] confluence_search: CQL로 페이지 검색 ✅ (type=page AND space=~KR18723 -> 83건 검색됨, CQL quote 처리 수정됨)
+- [x] confluence_search: CQL로 페이지 검색 ✅ (type=page AND space=~SPACE_KEY -> 83건 검색됨, CQL quote 처리 수정됨)
 - [x] confluence_search: 단순 텍스트 검색 ✅ (query: test, 211810건 검색됨)
-- [x] confluence_search: 특정 Space 필터링 검색 ✅ (spaces_filter: ~KR18723)
+- [x] confluence_search: 특정 Space 필터링 검색 ✅ (spaces_filter: ~SPACE_KEY)
 - [ ] confluence_search_user: 사용자 검색 ⚠️ (404 Not Found - 서버에서 미지원)
 
 ### 3. 코멘트 (Comments)
@@ -105,4 +105,4 @@ JiraClient.java에서 POST/PUT 요청이 204 No Content를 반환하는 경우 �
 #### C. CQL Space Key Quote 처리 수정
 - CqlUtils.java 생성: Python의 quote_cql_identifier_if_needed 포팅
 - ConfluenceTools.java Line 95: autoQuoteSpaceKeys() 호출 추가
-- `space = ~KR18723` → `space = "~KR18723"` 자동 변환으로 400 Bad Request 해결
+- `space = ~SPACE_KEY` → `space = "~SPACE_KEY"` 자동 변환으로 400 Bad Request 해결

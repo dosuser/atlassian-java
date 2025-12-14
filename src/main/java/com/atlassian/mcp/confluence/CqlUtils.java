@@ -71,8 +71,8 @@ public class CqlUtils {
     
     /**
      * CQL 쿼리에서 space key를 자동으로 quote 처리합니다.
-     * "space = ~KR18723" -> "space = \"~KR18723\""
-     * "space=~KR18723" -> "space=\"~KR18723\""
+     * "space = ~SPACE_KEY" -> "space = \"~SPACE_KEY\""
+     * "space=~SPACE_KEY" -> "space=\"~SPACE_KEY\""
      * 
      * @param cql 원본 CQL 쿼리
      * @return quote 처리된 CQL 쿼리

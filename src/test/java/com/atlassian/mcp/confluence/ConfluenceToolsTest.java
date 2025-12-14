@@ -57,7 +57,7 @@ class ConfluenceToolsTest {
     @Test
     void testSearch() {
         Map<String, Object> params = new HashMap<>();
-        params.put("cql", "type=page AND space=~KR18723");
+        params.put("cql", "type=page AND space=~TESTSPACE");
         params.put("limit", 5);
         
         Map<String, Object> result = confluenceTools.search(params).block();
@@ -152,7 +152,7 @@ class ConfluenceToolsTest {
     @Test
     void testSearchUser() {
         Map<String, Object> params = new HashMap<>();
-        params.put("query", "KR18723");
+        params.put("query", "testuser");
         
         Map<String, Object> result = confluenceTools.searchUser(params).block();
         
