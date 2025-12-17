@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+mcp:
+  transport:
+    streamFormat: ndjson
+
+app:
+  security:
+    mode: "${SECURITY_MODE:none}"  # none | jwt
+  jwt:
+    secret: "${JWT_SECRET:}"  # JWT 서명 검증용 시크릿
+
+atlassian:
+  jira:
+    baseUrl: "${JIRA_BASE_URL:https://your-jira-instance.atlassian.net}"
+  confluence:
+    baseUrl: "${CONFLUENCE_BASE_URL:https://your-confluence-instance.atlassian.net}"
